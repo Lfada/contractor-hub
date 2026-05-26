@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contractor Hub — Lucas Fada</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#fff; --bg2:#f5f5f4; --bg3:#eeede9;
+  --text:#1a1a1a; --text2:#666; --text3:#999;
+  --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.2);
+  --blue-bg:#e6f1fb; --blue-text:#185fa5;
+  --green-bg:#eaf3de; --green-text:#3b6d11;
+  --red-bg:#fcebeb; --red-text:#a32d2d;
+  --purple-bg:#f0ebfb; --purple-text:#5b21b6;
+  --orange-bg:#fef3e2; --orange-text:#92400e;
+  --accent:#1a1a1a; --radius:10px; --radius-sm:6px;
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg3); color:var(--text); min-height:100vh; }
+.app { max-width:920px; margin:0 auto; padding:2rem 1.5rem; }
+.header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; gap:1rem; flex-wrap:wrap; }
+.header-left h1 { font-size:22px; font-weight:600; }
+.header-left p { font-size:13px; color:var(--text2); margin-top:2px; }
+.header-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.rate-wrap { display:flex; align-items:center; gap:6px; }
+.rate-wrap label { font-size:12px; color:var(--text2); white-space:nowrap; }
+.sync-badge { display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:4px 10px; border-radius:20px; font-weight:500; }
+.sync-ok { background:var(--green-bg); color:var(--green-text); }
+.sync-pending { background:var(--bg2); color:var(--text2); border:0.5px solid var(--border); }
+.tabs { display:flex; gap:2px; background:var(--bg2); border-radius:var(--radius); padding:4px; margin-bottom:1.5rem; }
+.tab { flex:1; padding:8px; font-size:13px; background:none; border:none; border-radius:var(--radius-sm); cursor:pointer; color:var(--text2); font-weight:500; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:5px; }
+.tab:hover { background:var(--bg3); color:var(--text); }
+.tab.active { background:var(--bg); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.panel { display:none; } .panel.active { display:block; }
+.card { background:var(--bg); border-radius:var(--radius); border:0.5px solid var(--border); padding:1.25rem; margin-bottom:1rem; }
+.section-title { font-size:14px; font-weight:600; margin-bottom:1rem; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:1rem; }
+.grid6 { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:1rem; }
+label { font-size:12px; color:var(--text2); display:block; margin-bottom:4px; }
+input,select,textarea { width:100%; padding:7px 10px; font-size:13px; border:0.5px solid var(--border2); border-radius:var(--radius-sm); background:var(--bg); color:var(--text); font-family:inherit; transition:border-color .15s; }
+input:focus,select:focus,textarea:focus { outline:none; border-color:var(--accent); }
+textarea { resize:vertical; min-height:80px; line-height:1.5; }
+.btn { padding:8px 16px; border-radius:var(--radius-sm); border:0.5px solid var(--border2); background:var(--bg); cursor:pointer; font-size:13px; color:var(--text); font-family:inherit; font-weight:500; display:inline-flex; align-items:center; gap:5px; transition:all .15s; }
+.btn:hover { background:var(--bg2); } .btn:active { transform:scale(.98); }
+.btn-primary { background:var(--accent); color:#fff; border-color:transparent; }
+.btn-primary:hover { opacity:.88; background:var(--accent); }
+.btn-sm { padding:4px 10px; font-size:12px; }
+.btn-danger { border-color:#f0957b; color:var(--red-text); } .btn-danger:hover { background:var(--red-bg); }
+.flex { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.flex-between { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.metric { background:var(--bg2); border-radius:var(--radius-sm); padding:1rem; text-align:center; }
+.metric-label { font-size:11px; color:var(--text2); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em; }
+.metric-value { font-size:22px; font-weight:600; }
+.tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; background:var(--blue-bg); color:var(--blue-text); font-weight:500; white-space:nowrap; }
+.tag-int { background:var(--purple-bg); color:var(--purple-text); }
+.tag-ext { background:var(--orange-bg); color:var(--orange-text); }
+.date-group { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; padding:10px 0 4px; border-bottom:0.5px solid var(--border2); margin-bottom:2px; }
+.entry-row { display:grid; grid-template-columns:72px 72px 1fr 76px 68px; gap:8px; align-items:center; padding:7px 0; border-bottom:0.5px solid var(--border); }
+.entry-row:last-child { border-bottom:none; }
+.msg-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dot-funder { background:var(--blue-text); } .dot-wave { background:var(--green-text); }
+.dot-int { background:var(--purple-text); } .dot-ext { background:var(--orange-text); }
+.step-num { width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; font-size:12px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.setup-step { display:flex; gap:12px; margin-bottom:1rem; padding-bottom:1rem; border-bottom:0.5px solid var(--border); }
+.setup-step:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.setup-step-body { flex:1; }
+.setup-step-body strong { font-size:14px; display:block; margin-bottom:4px; }
+.setup-step-body p { font-size:13px; color:var(--text2); line-height:1.6; }
+.setup-step-body code { font-family:monospace; font-size:12px; background:var(--bg2); padding:1px 5px; border-radius:4px; border:0.5px solid var(--border); }
+.script-box { position:relative; margin-top:10px; }
+.script-box textarea { font-family:monospace; font-size:11px; background:var(--bg2); min-height:120px; }
+.script-box .copy-btn { position:absolute; top:8px; right:8px; }
+.invoice-table { width:100%; border-collapse:collapse; font-size:13px; }
+.invoice-table th { text-align:left; padding:7px 8px; font-size:11px; font-weight:600; color:var(--text2); border-bottom:0.5px solid var(--border2); text-transform:uppercase; letter-spacing:.04em; }
+.invoice-table td { padding:7px 8px; border-bottom:0.5px solid var(--border); }
+.invoice-table tfoot td { font-weight:600; border-top:1px solid var(--border2) !important; }
+.invoice-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:0.5px solid var(--border); }
+.empty { padding:1.5rem 0; color:var(--text3); font-size:13px; text-align:center; }
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; align-items:center; justify-content:center; }
+.overlay.open { display:flex; }
+.modal { background:var(--bg); border-radius:var(--radius); padding:1.5rem; width:500px; max-width:92vw; max-height:90vh; overflow-y:auto; }
+.modal-title { font-size:15px; font-weight:600; margin-bottom:1rem; }
+.hrs-hint { font-size:11px; color:var(--text3); margin-top:3px; }
+.tag-btn { padding:2px 10px; font-size:11px; border-radius:20px; border:1px solid; cursor:pointer; font-weight:400; transition:all .1s; background:transparent; }
+.tag-btn-int { border-color:var(--purple-text); color:var(--purple-text); }
+.tag-btn-int.active { background:var(--purple-bg); font-weight:600; }
+.tag-btn-ext { border-color:var(--orange-text); color:var(--orange-text); }
+.tag-btn-ext.active { background:var(--orange-bg); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div class="header-left">
+    <h1>Contractor hub</h1>
+    <p>Log hours · track messages · generate invoices</p>
+  </div>
+  <div class="header-right">
+    <div class="rate-wrap">
+      <label>Rate $/hr:</label>
+      <input type="number" id="hourly-rate" value="100" style="width:72px;" onchange="renderEntries();updateMetrics();" />
+    </div>
+    <div id="sync-status" class="sync-badge sync-pending"><i class="ti ti-cloud"></i> Not connected</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('log',this)"><i class="ti ti-clock"></i> Daily log</button>
+  <button class="tab" onclick="showTab('messages',this)"><i class="ti ti-message"></i> Messages</button>
+  <button class="tab" onclick="showTab('invoice',this)"><i class="ti ti-file-invoice"></i> Invoice</button>
+  <button class="tab" onclick="showTab('setup',this)"><i class="ti ti-settings"></i> Setup</button>
+</div>
+
+<!-- DAILY LOG -->
+<div id="panel-log" class="panel active">
+  <div class="card">
+    <div class="section-title">Add entry</div>
+    <div style="display:grid;grid-template-columns:120px 120px 1fr;gap:10px;margin-bottom:12px;">
+      <div><label>Date</label><input type="date" id="entry-date" /></div>
+      <div>
+        <label>Hours worked</label>
+        <input type="number" id="entry-hours-raw" step="0.25" min="0" max="16" placeholder="6" oninput="updateUnitsPreview()" />
+        <div class="hrs-hint" id="units-preview">— units</div>
+      </div>
+      <div><label>What I did today</label><input type="text" id="entry-notes" placeholder="Wave outreach, maintainer calls, internal syncs..." onkeydown="if(event.key==='Enter')addEntry()" /></div>
+    </div>
+    <div class="flex">
+      <button class="btn btn-primary" onclick="addEntry()"><i class="ti ti-plus"></i> Add entry</button>
+      <button class="btn" id="cal-btn" onclick="fetchCalendar()"><i class="ti ti-calendar"></i> Pull from calendar</button>
+    </div>
+    <div id="cal-events" style="display:none;margin-top:12px;border-top:0.5px solid var(--border);padding-top:12px;"></div>
+  </div>
+
+  <div class="grid4">
+    <div class="metric"><div class="metric-label">Days logged</div><div class="metric-value" id="m-days">0</div></div>
+    <div class="metric"><div class="metric-label">Total units</div><div class="metric-value" id="m-units">0</div></div>
+    <div class="metric"><div class="metric-label">Total hours</div><div class="metric-value" id="m-hours">0h</div></div>
+    <div class="metric"><div class="metric-label">Earned</div><div class="metric-value" id="m-earned">$0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between" style="margin-bottom:12px;">
+      <div class="section-title" style="margin:0;">Entries</div>
+      <div class="flex">
+        <select id="filter-month" onchange="renderEntries()" style="width:auto;font-size:13px;"></select>
+        <button class="btn btn-sm" onclick="clearEntries()">Clear all</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:72px 72px 1fr 76px 68px;gap:8px;padding:4px 0 8px;border-bottom:0.5px solid var(--border2);">
+      <span style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Hours</span>
+      <span style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Units</span>
+      <span style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Notes</span>
+      <span style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Earned</span>
+      <span></span>
+    </div>
+    <div id="entries-list"><div class="empty">No entries yet.</div></div>
+  </div>
+</div>
+
+<!-- MESSAGES -->
+<div id="panel-messages" class="panel">
+  <div class="grid2" style="margin-bottom:0;">
+    <div class="card">
+      <div class="msg-section-label"><span class="dot dot-funder"></span> Funder messaging</div>
+      <div class="grid2">
+        <div><label>New messages</label><input type="number" id="f-new" placeholder="0" /></div>
+        <div><label>Follow-ups</label><input type="number" id="f-fu" placeholder="0" /></div>
+      </div>
+      <div class="grid2">
+        <div><label>Responses</label><input type="number" id="f-resp" placeholder="0" /></div>
+        <div><label>Funders targeted</label><input type="text" id="f-names" placeholder="a16z, Paradigm..." /></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="msg-section-label"><span class="dot dot-wave"></span> Wave messaging</div>
+      <div class="grid2">
+        <div><label>New messages</label><input type="number" id="w-new" placeholder="0" /></div>
+        <div><label>Follow-ups</label><input type="number" id="w-fu" placeholder="0" /></div>
+      </div>
+      <div class="grid2">
+        <div><label>Responses</label><input type="number" id="w-resp" placeholder="0" /></div>
+        <div><label>Communities</label><input type="text" id="w-names" placeholder="Stellar, Monad..." /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:0;">
+    <div class="card">
+      <div class="msg-section-label"><span class="dot dot-int"></span> Internal calls <span style="font-size:11px;font-weight:400;color:var(--text3);">(@drips.network)</span></div>
+      <div class="grid2">
+        <div><label>Call count</label><input type="number" id="c-int" placeholder="0" /></div>
+        <div><label>Notes</label><input type="text" id="c-int-notes" placeholder="Daily standups, ops sync..." /></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="msg-section-label"><span class="dot dot-ext"></span> External calls</div>
+      <div class="grid2">
+        <div><label>Call count</label><input type="number" id="c-ext" placeholder="0" /></div>
+        <div><label>Notes</label><input type="text" id="c-ext-notes" placeholder="Maintainer intros, Stellar sync..." /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid3">
+      <div><label>Week of</label><input type="date" id="msg-week" /></div>
+      <div><label>TG groups created</label><input type="number" id="msg-tg" placeholder="0" /></div>
+      <div><label>Notes</label><input type="text" id="msg-notes" placeholder="Any context..." /></div>
+    </div>
+    <div class="flex">
+      <button class="btn btn-primary" onclick="addMsgEntry()"><i class="ti ti-plus"></i> Log week</button>
+      <button class="btn" id="cal-msg-btn" onclick="fetchCalendarCalls()"><i class="ti ti-calendar"></i> Pull calls from calendar</button>
+    </div>
+    <div id="cal-calls-result" style="display:none;margin-top:12px;border-top:0.5px solid var(--border);padding-top:12px;"></div>
+  </div>
+
+  <div class="grid6">
+    <div class="metric"><div class="metric-label">Funder msgs</div><div class="metric-value" id="mm-funder">0</div></div>
+    <div class="metric"><div class="metric-label">Wave msgs</div><div class="metric-value" id="mm-wave">0</div></div>
+    <div class="metric"><div class="metric-label">Funder resp%</div><div class="metric-value" id="mm-frr">—</div></div>
+    <div class="metric"><div class="metric-label">Wave resp%</div><div class="metric-value" id="mm-wrr">—</div></div>
+    <div class="metric"><div class="metric-label">Internal calls</div><div class="metric-value" id="mm-cint">0</div></div>
+    <div class="metric"><div class="metric-label">External calls</div><div class="metric-value" id="mm-cext">0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between" style="margin-bottom:12px;">
+      <div class="section-title" style="margin:0;">Activity log</div>
+      <button class="btn btn-sm" onclick="clearMsgEntries()">Clear all</button>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 50px 50px 50px 50px 44px 44px 44px 68px;gap:6px;padding:4px 0 8px;border-bottom:0.5px solid var(--border2);">
+      <span style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;">Week</span>
+      <span style="font-size:10px;color:var(--blue-text);font-weight:600;text-transform:uppercase;">F.New</span>
+      <span style="font-size:10px;color:var(--blue-text);font-weight:600;text-transform:uppercase;">F.FU</span>
+      <span style="font-size:10px;color:var(--green-text);font-weight:600;text-transform:uppercase;">W.New</span>
+      <span style="font-size:10px;color:var(--green-text);font-weight:600;text-transform:uppercase;">W.FU</span>
+      <span style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;">TG</span>
+      <span style="font-size:10px;color:var(--purple-text);font-weight:600;text-transform:uppercase;">Int</span>
+      <span style="font-size:10px;color:var(--orange-text);font-weight:600;text-transform:uppercase;">Ext</span>
+      <span></span>
+    </div>
+    <div id="msg-list"><div class="empty">No entries yet.</div></div>
+  </div>
+</div>
+
+<!-- INVOICE -->
+<div id="panel-invoice" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="section-title">Your info</div>
+      <div style="display:grid;gap:10px;">
+        <div><label>Name</label><input type="text" id="inv-name" value="Lucas Fada" /></div>
+        <div><label>Address</label><input type="text" id="inv-addr" value="365 Atlantic Ave, 11217 Brooklyn, NY USA" /></div>
+        <div><label>Email</label><input type="text" id="inv-email" value="lucasfada93@gmail.com" /></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Invoice details</div>
+      <div style="display:grid;gap:10px;">
+        <div><label>Invoice #</label><input type="text" id="inv-num" value="#0048" /></div>
+        <div class="grid2" style="margin:0;">
+          <div><label>Invoice date</label><input type="date" id="inv-date" /></div>
+          <div><label>Due date</label><input type="date" id="inv-due" /></div>
+        </div>
+        <div><label>Billing month</label><input type="month" id="inv-period" /></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">Summary of work</div>
+    <textarea id="inv-summary" placeholder="Describe work performed this period..."></textarea>
+  </div>
+  <div class="flex" style="margin-bottom:1rem;">
+    <button class="btn btn-primary" onclick="generateInvoice()"><i class="ti ti-file-invoice"></i> Generate invoice</button>
+    <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Print / save PDF</button>
+  </div>
+  <div id="invoice-preview" style="display:none;" class="card"></div>
+</div>
+
+<!-- SETUP -->
+<div id="panel-setup" class="panel">
+  <div class="card">
+    <div class="section-title">Google Sheets connection</div>
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="setup-step-body">
+        <strong>Open your Google Sheet</strong>
+        <p><a href="https://docs.google.com/spreadsheets/d/1NopZRylllxhvK6j6xUja6s52R6AOpqGvCCVmLTcj4fI/edit" target="_blank" style="color:var(--blue-text);">Contractor Hub — Lucas Fada ↗</a></p>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="setup-step-body">
+        <strong>Open Apps Script</strong>
+        <p><code>Extensions</code> → <code>Apps Script</code>. Select all and delete.</p>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="setup-step-body">
+        <strong>Paste this script</strong>
+        <div class="script-box">
+          <textarea id="apps-script-code" readonly></textarea>
+          <button class="btn btn-sm copy-btn" onclick="copyScript(this)"><i class="ti ti-copy"></i> Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="setup-step-body">
+        <strong>Deploy as web app</strong>
+        <p>Save (<code>Cmd+S</code>) → <code>Deploy</code> → <code>New deployment</code> → type: <code>Web app</code> → access: <code>Anyone</code> → Deploy → authorize → copy URL.</p>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">5</div>
+      <div class="setup-step-body">
+        <strong>Paste your web app URL</strong>
+        <div class="flex" style="margin-top:8px;">
+          <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;" />
+          <button class="btn btn-primary" onclick="saveScriptUrl()">Save & test</button>
+        </div>
+        <div id="connection-result" style="margin-top:8px;font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">Manage</div>
+    <div class="flex">
+      <button class="btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1NopZRylllxhvK6j6xUja6s52R6AOpqGvCCVmLTcj4fI/edit','_blank')"><i class="ti ti-external-link"></i> Open Google Sheet</button>
+      <button class="btn" onclick="syncAll()"><i class="ti ti-refresh"></i> Re-sync all entries</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<!-- EDIT ENTRY MODAL -->
+<div class="overlay" id="edit-overlay" onclick="if(event.target===this)closeModal('edit-overlay')">
+  <div class="modal">
+    <div class="modal-title">Edit entry</div>
+    <div style="display:grid;gap:10px;margin-bottom:1rem;">
+      <div><label>Date</label><input type="date" id="edit-date" /></div>
+      <div>
+        <label>Hours worked</label>
+        <input type="number" id="edit-hours" step="0.25" min="0" max="16" oninput="document.getElementById('edit-units-hint').textContent=hoursToUnits(parseFloat(this.value)||0)+' units'" />
+        <div class="hrs-hint" id="edit-units-hint"></div>
+      </div>
+      <div><label>Notes</label><input type="text" id="edit-notes" /></div>
+    </div>
+    <div class="flex">
+      <button class="btn btn-primary" onclick="saveEntryEdit()">Save</button>
+      <button class="btn" onclick="closeModal('edit-overlay')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MSG MODAL -->
+<div class="overlay" id="edit-msg-overlay" onclick="if(event.target===this)closeModal('edit-msg-overlay')">
+  <div class="modal">
+    <div class="modal-title">Edit week</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">
+      <div style="grid-column:span 2;"><label>Week of</label><input type="date" id="em-week" /></div>
+      <div><label>Funder new</label><input type="number" id="em-fnew" /></div>
+      <div><label>Funder follow-ups</label><input type="number" id="em-ffu" /></div>
+      <div><label>Funder responses</label><input type="number" id="em-fresp" /></div>
+      <div><label>Funders targeted</label><input type="text" id="em-fnames" /></div>
+      <div><label>Wave new</label><input type="number" id="em-wnew" /></div>
+      <div><label>Wave follow-ups</label><input type="number" id="em-wfu" /></div>
+      <div><label>Wave responses</label><input type="number" id="em-wresp" /></div>
+      <div><label>Communities</label><input type="text" id="em-wnames" /></div>
+      <div><label>Internal calls</label><input type="number" id="em-cint" /></div>
+      <div><label>Int. notes</label><input type="text" id="em-cintnotes" /></div>
+      <div><label>External calls</label><input type="number" id="em-cext" /></div>
+      <div><label>Ext. notes</label><input type="text" id="em-cextnotes" /></div>
+      <div><label>TG groups</label><input type="number" id="em-tg" /></div>
+      <div><label>Notes</label><input type="text" id="em-notes" /></div>
+    </div>
+    <div class="flex">
+      <button class="btn btn-primary" onclick="saveMsgEdit()">Save</button>
+      <button class="btn" onclick="closeModal('edit-msg-overlay')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── APPS SCRIPT CODE (shown in Setup tab) ──────────────────────────────────
+const SCRIPT_CODE = `const SHEET_ID = '1NopZRylllxhvK6j6xUja6s52R6AOpqGvCCVmLTcj4fI';
+
+function doPost(e) {
+  const out = ContentService.createTextOutput().setMimeType(ContentService.MimeType.JSON);
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+
+    if (data.action === 'addEntry') {
+      let s = ss.getSheetByName('Daily Log');
+      if (!s) { s = ss.insertSheet('Daily Log'); s.appendRow(['Date','Hours','Units','Amount','Notes','Synced At']); s.getRange(1,1,1,6).setFontWeight('bold'); }
+      s.appendRow([data.date, data.hours, +(data.hours/8).toFixed(4), data.hours*(data.rate||100), data.notes, new Date().toISOString()]);
+    }
+
+    if (data.action === 'addMsgEntry') {
+      let s = ss.getSheetByName('Message Tracker');
+      if (!s) { s = ss.insertSheet('Message Tracker'); s.appendRow(['Week','F.New','F.FU','F.Resp','W.New','W.FU','W.Resp','TG','Int Calls','Ext Calls','Notes','Synced At']); s.getRange(1,1,1,12).setFontWeight('bold'); }
+      s.appendRow([data.week,data.fNew,data.fFu,data.fResp,data.wNew,data.wFu,data.wResp,data.tg,data.cInt,data.cExt,data.notes,new Date().toISOString()]);
+    }
+
+    if (data.action === 'getCalendar') {
+      const p = data.date.split('-');
+      const start = new Date(p[0],p[1]-1,p[2],0,0,0);
+      const end   = new Date(p[0],p[1]-1,p[2],23,59,59);
+      const myEmail = Session.getActiveUser().getEmail().toLowerCase();
+      const seen = {};
+      const events = [];
+      for (const cal of CalendarApp.getAllCalendars()) {
+        for (const ev of cal.getEvents(start, end)) {
+          const key = ev.getTitle() + ev.getStartTime().getTime();
+          if (seen[key]) continue; seen[key] = true;
+          const creators = ev.getCreators ? ev.getCreators() : [];
+          const organizer = (creators[0] || myEmail).toLowerCase();
+          const guestList = ev.getGuestList(true);
+          const guestEmails = guestList.map(g => g.getEmail().toLowerCase());
+          const allEmails = [...new Set([organizer,...guestEmails])].filter(Boolean);
+          const dripsCount = allEmails.filter(e => e.includes('drips.network')).length;
+          const extCount = allEmails.length - dripsCount;
+          const workRelated = dripsCount > 0 || cal.getName().toLowerCase().includes('drips');
+          if (!workRelated) continue;
+          const isInternal = allEmails.length === 0 || dripsCount/allEmails.length > 0.5;
+          const isAllDay = ev.isAllDayEvent();
+          const durationMins = isAllDay ? 480 : Math.round((ev.getEndTime()-ev.getStartTime())/60000);
+          const timeStr = isAllDay ? 'all-day' : Utilities.formatDate(ev.getStartTime(), Session.getScriptTimeZone(), 'h:mm a');
+          const guestNames = guestList.filter(g=>g.getEmail().toLowerCase()!==myEmail).map(g=>g.getName()||g.getEmail().split('@')[0]).filter(Boolean);
+          const t = ev.getTitle().toLowerCase();
+          const looksLikeCall = guestEmails.length>0||['call','sync','meeting','1:1','standup','intro','demo','review','kickoff','onboarding','interview'].some(w=>t.includes(w));
+          events.push({title:ev.getTitle(),time:timeStr,guests:guestNames,isAllDay,isInternal,looksLikeCall,durationMins,dripsCount,extCount});
+        }
+      }
+      events.sort((a,b)=>(a.isAllDay?1:-1)-(b.isAllDay?1:-1));
+      out.setContent(JSON.stringify({ok:true,events}));
+      return out;
+    }
+
+    out.setContent(JSON.stringify({ok:true}));
+  } catch(err) { out.setContent(JSON.stringify({ok:false,error:err.toString()})); }
+  return out;
+}
+function doGet() { return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON); }
+function requestCalendarAccess() { CalendarApp.getAllCalendars(); }`;
+
+document.getElementById('apps-script-code').value = SCRIPT_CODE;
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let entries    = JSON.parse(localStorage.getItem('ch_entries') || '[]');
+let msgEntries = JSON.parse(localStorage.getItem('ch_msgs')    || '[]');
+let scriptUrl  = localStorage.getItem('ch_script_url') || '';
+let calWeekEvents = [];
+let editingEntryId = null;
+let editingMsgId   = null;
+
+// ── MIGRATION: old entries stored hours as units (0-1 scale) ──────────────
+(function migrate() {
+  let changed = false;
+  entries = entries.map(e => {
+    if (!e.migrated && e.hours <= 1.5) {
+      e.hours = +(e.hours * 8).toFixed(2);
+      e.migrated = true; changed = true;
+    }
+    if (!e.units) { e.units = hoursToUnits(e.hours); changed = true; }
+    return e;
+  });
+  if (changed) save();
+})();
+
+if (scriptUrl) {
+  document.getElementById('script-url').value = scriptUrl;
+  setSyncBadge(true);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function save()    { localStorage.setItem('ch_entries', JSON.stringify(entries)); }
+function saveMsg() { localStorage.setItem('ch_msgs',    JSON.stringify(msgEntries)); }
+function getRate() { return parseFloat(document.getElementById('hourly-rate').value) || 100; }
+function hoursToUnits(h) { return +(h / 8).toFixed(4); }
+function setSyncBadge(ok) {
+  const el = document.getElementById('sync-status');
+  el.className = 'sync-badge ' + (ok ? 'sync-ok' : 'sync-pending');
+  el.innerHTML = ok ? '<i class="ti ti-cloud-check"></i> Sheets connected' : '<i class="ti ti-cloud"></i> Not connected';
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showTab(t, el) {
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+  if (t==='invoice') prefillInvoice();
+}
+function updateUnitsPreview() {
+  const h = parseFloat(document.getElementById('entry-hours-raw').value);
+  document.getElementById('units-preview').textContent = isNaN(h)||h<=0 ? '— units' : hoursToUnits(h)+' units';
+}
+async function syncToSheets(action, payload) {
+  if (!scriptUrl) return;
+  try { await fetch(scriptUrl, {method:'POST', body:JSON.stringify({action,...payload}), mode:'no-cors'}); }
+  catch(e) { console.warn('Sync failed',e); }
+}
+function formatDateLabel(ds) {
+  const [y,m,d] = ds.split('-').map(Number);
+  const date = new Date(y,m-1,d);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const yest  = new Date(today); yest.setDate(today.getDate()-1);
+  if (date.getTime()===today.getTime()) return 'Today';
+  if (date.getTime()===yest.getTime())  return 'Yesterday';
+  return date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+// ── DAILY LOG ──────────────────────────────────────────────────────────────
+function addEntry() {
+  const d = document.getElementById('entry-date').value;
+  const h = parseFloat(document.getElementById('entry-hours-raw').value);
+  const n = document.getElementById('entry-notes').value.trim();
+  if (!d || isNaN(h) || h<=0) return;
+  const entry = {date:d, hours:h, units:hoursToUnits(h), notes:n, id:Date.now()};
+  entries.push(entry);
+  entries.sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  save();
+  document.getElementById('entry-hours-raw').value='';
+  document.getElementById('entry-notes').value='';
+  document.getElementById('units-preview').textContent='— units';
+  document.getElementById('cal-events').style.display='none';
+  updateMonthFilter(); renderEntries();
+  syncToSheets('addEntry',{date:d,hours:h,notes:n,rate:getRate()});
+}
+function deleteEntry(id) { entries=entries.filter(e=>e.id!==id); save(); renderEntries(); updateMetrics(); }
+function clearEntries() { if(!confirm('Clear all entries?')) return; entries=[]; save(); updateMonthFilter(); renderEntries(); updateMetrics(); }
+
+function openEditEntry(id) {
+  const e = entries.find(x=>x.id===id); if(!e) return;
+  editingEntryId = id;
+  document.getElementById('edit-date').value  = e.date;
+  document.getElementById('edit-hours').value = e.hours;
+  document.getElementById('edit-units-hint').textContent = hoursToUnits(e.hours)+' units';
+  document.getElementById('edit-notes').value = e.notes||'';
+  document.getElementById('edit-overlay').classList.add('open');
+}
+function saveEntryEdit() {
+  const d=document.getElementById('edit-date').value;
+  const h=parseFloat(document.getElementById('edit-hours').value);
+  const n=document.getElementById('edit-notes').value.trim();
+  if(!d||isNaN(h)||h<=0) return;
+  entries=entries.map(e=>e.id===editingEntryId?{...e,date:d,hours:h,units:hoursToUnits(h),notes:n}:e);
+  entries.sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  save(); renderEntries(); updateMetrics();
+  closeModal('edit-overlay');
+}
+
+function updateMonthFilter() {
+  const sel=document.getElementById('filter-month');
+  const cur=sel.value;
+  const months=[...new Set(entries.map(e=>e.date.slice(0,7)))].sort().reverse();
+  sel.innerHTML='<option value="">All months</option>'+months.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+}
+function renderEntries() {
+  const filter=document.getElementById('filter-month').value;
+  const rate=getRate();
+  const filtered=filter?entries.filter(e=>e.date.startsWith(filter)):entries;
+  const list=document.getElementById('entries-list');
+  if(!filtered.length){list.innerHTML='<div class="empty">No entries yet.</div>';updateMetrics([]);return;}
+  const byDate={};
+  filtered.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+  list.innerHTML=Object.keys(byDate).sort().reverse().map(date=>{
+    const dayH=byDate[date].reduce((s,e)=>s+e.hours,0);
+    const rows=byDate[date].map(e=>`<div class="entry-row">
+      <span style="font-size:13px;font-weight:500;">${e.hours}h</span>
+      <span class="tag">${e.units}</span>
+      <span style="font-size:13px;color:var(--text2);">${e.notes||'—'}</span>
+      <span style="font-size:13px;color:var(--text2);">$${Math.round(e.hours*rate)}</span>
+      <div class="flex" style="gap:4px;">
+        <button class="btn btn-sm" onclick="openEditEntry(${e.id})" style="padding:3px 7px;"><i class="ti ti-pencil"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})" style="padding:3px 7px;"><i class="ti ti-x"></i></button>
+      </div>
+    </div>`).join('');
+    return `<div class="date-group">${formatDateLabel(date)} <span style="font-weight:400;color:var(--text3);">· ${dayH}h · $${Math.round(dayH*rate)}</span></div>${rows}`;
+  }).join('');
+  updateMetrics(filtered);
+}
+function updateMetrics(filtered) {
+  filtered=filtered!==undefined?filtered:entries;
+  const rate=getRate();
+  const totalH=filtered.reduce((s,e)=>s+e.hours,0);
+  document.getElementById('m-days').textContent=filtered.length;
+  document.getElementById('m-units').textContent=hoursToUnits(totalH);
+  document.getElementById('m-hours').textContent=totalH.toFixed(1)+'h';
+  document.getElementById('m-earned').textContent='$'+Math.round(totalH*rate).toLocaleString();
+}
+
+// ── CALENDAR (daily) ───────────────────────────────────────────────────────
+async function fetchCalendar() {
+  if(!scriptUrl){alert('Connect Google Sheets first in the Setup tab.');return;}
+  const date=document.getElementById('entry-date').value;
+  if(!date){alert('Pick a date first.');return;}
+  const btn=document.getElementById('cal-btn');
+  btn.innerHTML='<i class="ti ti-loader"></i> Loading...'; btn.disabled=true;
+  try {
+    const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'getCalendar',date})});
+    const data=await r.json();
+    if(!data.ok) throw new Error(data.error||'Unknown error');
+    const panel=document.getElementById('cal-events');
+    if(!data.events||!data.events.length){
+      panel.style.display='block';
+      panel.innerHTML='<div style="font-size:13px;color:var(--text2);">No Drips work events found. Your work calendar may not be synced to your personal Google account.</div>';
+    } else {
+      const totalMins=data.events.reduce((s,ev)=>s+(ev.durationMins||0),0);
+      const totalH=+(totalMins/60).toFixed(2);
+      if(totalH>0){document.getElementById('entry-hours-raw').value=totalH;updateUnitsPreview();}
+      const summary=data.events.map(ev=>{
+        let s=ev.title;
+        if(ev.guests&&ev.guests.length) s+=' (w/ '+ev.guests.slice(0,2).join(', ')+(ev.guests.length>2?'...':'')+')';
+        return s;
+      }).join(', ');
+      document.getElementById('entry-notes').value=summary;
+      panel.style.display='block';
+      panel.innerHTML='<div style="font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:600;">'+data.events.length+' event(s) — '+totalH+'h total · notes pre-filled</div>'+
+        data.events.map(ev=>{
+          const typeTag=ev.isInternal
+            ?'<span class="tag tag-int" style="font-size:10px;">internal</span>'
+            :'<span class="tag tag-ext" style="font-size:10px;">external</span>';
+          const gStr=ev.guests&&ev.guests.length?' <span style="color:var(--text3);">w/ '+ev.guests.slice(0,2).join(', ')+(ev.guests.length>2?'...':'')+' </span>':'';
+          return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px;">'+
+            '<span style="font-size:11px;color:var(--text2);min-width:55px;">'+ev.time+'</span>'+typeTag+
+            '<span>'+ev.title+gStr+'</span>'+
+            '<span style="font-size:11px;color:var(--text3);margin-left:auto;">'+(ev.durationMins?ev.durationMins+'min':'')+'</span></div>';
+        }).join('')+
+        '<div style="margin-top:8px;font-size:12px;color:var(--text2);">Hours & notes pre-filled. Edit as needed then hit Add entry.</div>';
+    }
+  } catch(err) {
+    const panel=document.getElementById('cal-events');
+    panel.style.display='block';
+    panel.innerHTML='<div style="font-size:13px;color:var(--red-text);">Could not fetch calendar: '+err.message+'</div>';
+  }
+  btn.innerHTML='<i class="ti ti-calendar"></i> Pull from calendar'; btn.disabled=false;
+}
+
+// ── MESSAGES ───────────────────────────────────────────────────────────────
+function addMsgEntry() {
+  const w=document.getElementById('msg-week').value; if(!w) return;
+  const e={
+    id:Date.now(), week:w,
+    fNew:parseInt(document.getElementById('f-new').value)||0,
+    fFu:parseInt(document.getElementById('f-fu').value)||0,
+    fResp:parseInt(document.getElementById('f-resp').value)||0,
+    fNames:document.getElementById('f-names').value,
+    wNew:parseInt(document.getElementById('w-new').value)||0,
+    wFu:parseInt(document.getElementById('w-fu').value)||0,
+    wResp:parseInt(document.getElementById('w-resp').value)||0,
+    wNames:document.getElementById('w-names').value,
+    cInt:parseInt(document.getElementById('c-int').value)||0,
+    cIntNotes:document.getElementById('c-int-notes').value,
+    cExt:parseInt(document.getElementById('c-ext').value)||0,
+    cExtNotes:document.getElementById('c-ext-notes').value,
+    tg:parseInt(document.getElementById('msg-tg').value)||0,
+    notes:document.getElementById('msg-notes').value
+  };
+  msgEntries.push(e);
+  msgEntries.sort((a,b)=>b.week.localeCompare(a.week));
+  saveMsg(); renderMsgEntries(); updateMsgMetrics();
+  syncToSheets('addMsgEntry',e);
+  ['f-new','f-fu','f-resp','f-names','w-new','w-fu','w-resp','w-names','c-int','c-int-notes','c-ext','c-ext-notes','msg-tg','msg-notes'].forEach(id=>document.getElementById(id).value='');
+}
+function deleteMsgEntry(id){msgEntries=msgEntries.filter(e=>e.id!==id);saveMsg();renderMsgEntries();updateMsgMetrics();}
+function clearMsgEntries(){if(!confirm('Clear all?'))return;msgEntries=[];saveMsg();renderMsgEntries();updateMsgMetrics();}
+
+function openEditMsg(id) {
+  const e=msgEntries.find(x=>x.id===id); if(!e) return;
+  editingMsgId=id;
+  document.getElementById('em-week').value=e.week;
+  document.getElementById('em-fnew').value=e.fNew||0;
+  document.getElementById('em-ffu').value=e.fFu||0;
+  document.getElementById('em-fresp').value=e.fResp||0;
+  document.getElementById('em-fnames').value=e.fNames||'';
+  document.getElementById('em-wnew').value=e.wNew||0;
+  document.getElementById('em-wfu').value=e.wFu||0;
+  document.getElementById('em-wresp').value=e.wResp||0;
+  document.getElementById('em-wnames').value=e.wNames||'';
+  document.getElementById('em-cint').value=e.cInt||0;
+  document.getElementById('em-cintnotes').value=e.cIntNotes||'';
+  document.getElementById('em-cext').value=e.cExt||0;
+  document.getElementById('em-cextnotes').value=e.cExtNotes||'';
+  document.getElementById('em-tg').value=e.tg||0;
+  document.getElementById('em-notes').value=e.notes||'';
+  document.getElementById('edit-msg-overlay').classList.add('open');
+}
+function saveMsgEdit() {
+  msgEntries=msgEntries.map(e=>e.id===editingMsgId?{...e,
+    week:document.getElementById('em-week').value,
+    fNew:parseInt(document.getElementById('em-fnew').value)||0,
+    fFu:parseInt(document.getElementById('em-ffu').value)||0,
+    fResp:parseInt(document.getElementById('em-fresp').value)||0,
+    fNames:document.getElementById('em-fnames').value,
+    wNew:parseInt(document.getElementById('em-wnew').value)||0,
+    wFu:parseInt(document.getElementById('em-wfu').value)||0,
+    wResp:parseInt(document.getElementById('em-wresp').value)||0,
+    wNames:document.getElementById('em-wnames').value,
+    cInt:parseInt(document.getElementById('em-cint').value)||0,
+    cIntNotes:document.getElementById('em-cintnotes').value,
+    cExt:parseInt(document.getElementById('em-cext').value)||0,
+    cExtNotes:document.getElementById('em-cextnotes').value,
+    tg:parseInt(document.getElementById('em-tg').value)||0,
+    notes:document.getElementById('em-notes').value
+  }:e);
+  saveMsg(); renderMsgEntries(); updateMsgMetrics();
+  closeModal('edit-msg-overlay');
+}
+
+function renderMsgEntries() {
+  const list=document.getElementById('msg-list');
+  if(!msgEntries.length){list.innerHTML='<div class="empty">No entries yet.</div>';return;}
+  list.innerHTML=msgEntries.map(e=>`<div style="display:grid;grid-template-columns:80px 50px 50px 50px 50px 44px 44px 44px 68px;gap:6px;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px;">
+    <span>${e.week.slice(5)}</span>
+    <span style="color:var(--blue-text);">${e.fNew||0}</span>
+    <span style="color:var(--blue-text);">${e.fFu||0}</span>
+    <span style="color:var(--green-text);">${e.wNew||0}</span>
+    <span style="color:var(--green-text);">${e.wFu||0}</span>
+    <span>${e.tg||0}</span>
+    <span style="color:var(--purple-text);">${e.cInt||0}</span>
+    <span style="color:var(--orange-text);">${e.cExt||0}</span>
+    <div class="flex" style="gap:4px;">
+      <button class="btn btn-sm" onclick="openEditMsg(${e.id})" style="padding:3px 7px;"><i class="ti ti-pencil"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteMsgEntry(${e.id})" style="padding:3px 7px;"><i class="ti ti-x"></i></button>
+    </div>
+  </div>`).join('');
+}
+function updateMsgMetrics() {
+  const tFN=msgEntries.reduce((s,e)=>s+(e.fNew||0),0);
+  const tFF=msgEntries.reduce((s,e)=>s+(e.fFu||0),0);
+  const tFR=msgEntries.reduce((s,e)=>s+(e.fResp||0),0);
+  const tWN=msgEntries.reduce((s,e)=>s+(e.wNew||0),0);
+  const tWF=msgEntries.reduce((s,e)=>s+(e.wFu||0),0);
+  const tWR=msgEntries.reduce((s,e)=>s+(e.wResp||0),0);
+  const tCI=msgEntries.reduce((s,e)=>s+(e.cInt||0),0);
+  const tCE=msgEntries.reduce((s,e)=>s+(e.cExt||0),0);
+  document.getElementById('mm-funder').textContent=tFN+tFF;
+  document.getElementById('mm-wave').textContent=tWN+tWF;
+  document.getElementById('mm-frr').textContent=tFN?Math.round(tFR/tFN*100)+'%':'—';
+  document.getElementById('mm-wrr').textContent=tWN?Math.round(tWR/tWN*100)+'%':'—';
+  document.getElementById('mm-cint').textContent=tCI;
+  document.getElementById('mm-cext').textContent=tCE;
+}
+
+// ── CALENDAR CALLS (weekly, with tagging UI) ───────────────────────────────
+async function fetchCalendarCalls() {
+  if(!scriptUrl){alert('Connect Google Sheets first in the Setup tab.');return;}
+  const date=document.getElementById('msg-week').value;
+  if(!date){alert('Pick a week date first.');return;}
+  const btn=document.getElementById('cal-msg-btn');
+  btn.innerHTML='<i class="ti ti-loader"></i> Loading...'; btn.disabled=true;
+  calWeekEvents=[];
+  try {
+    for(let i=0;i<7;i++){
+      const d=new Date(date); d.setDate(d.getDate()+i);
+      const ds=d.toISOString().slice(0,10);
+      const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'getCalendar',date:ds})});
+      const data=await r.json();
+      if(!data.ok||!data.events) continue;
+      data.events.forEach(ev=>calWeekEvents.push({...ev,date:ds,tag:ev.isInternal?'internal':'external',included:ev.looksLikeCall}));
+    }
+    renderCalTagger();
+  } catch(err) {
+    const res=document.getElementById('cal-calls-result');
+    res.style.display='block';
+    res.innerHTML='<div style="color:var(--red-text);font-size:13px;">Could not fetch: '+err.message+'</div>';
+  }
+  btn.innerHTML='<i class="ti ti-calendar"></i> Pull calls from calendar'; btn.disabled=false;
+}
+
+function renderCalTagger() {
+  const res=document.getElementById('cal-calls-result');
+  res.style.display='block';
+  if(!calWeekEvents.length){res.innerHTML='<div style="font-size:13px;color:var(--text2);">No Drips work events found this week.</div>';return;}
+  const byDate={};
+  calWeekEvents.forEach((ev,i)=>{if(!byDate[ev.date])byDate[ev.date]=[];byDate[ev.date].push({...ev,idx:i});});
+  const blocks=Object.keys(byDate).sort().map(date=>{
+    const label=new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const rows=byDate[date].map(ev=>{
+      const e=calWeekEvents[ev.idx];
+      const gStr=ev.guests&&ev.guests.length?' <span style="color:var(--text3);font-size:11px;">w/ '+ev.guests.slice(0,2).join(', ')+(ev.guests.length>2?'...':'')+' </span>':'';
+      const dur=ev.durationMins?'<span style="color:var(--text3);font-size:11px;">'+ev.durationMins+'min</span>':'';
+      return `<div style="display:grid;grid-template-columns:50px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px;">
+        <span style="font-size:11px;color:var(--text2);">${ev.time}</span>
+        <span>${ev.title}${gStr} ${dur}</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button id="ti-${ev.idx}" class="tag-btn tag-btn-int ${e.tag==='internal'?'active':''}" onclick="tagEv(${ev.idx},'internal')">internal</button>
+          <button id="te-${ev.idx}" class="tag-btn tag-btn-ext ${e.tag==='external'?'active':''}" onclick="tagEv(${ev.idx},'external')">external</button>
+          <input type="checkbox" ${e.included?'checked':''} onchange="toggleEv(${ev.idx},this.checked)" style="width:15px;cursor:pointer;" title="Include as a call" />
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:8px 0 4px;">${label}</div>${rows}`;
+  }).join('');
+  res.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Check events to count as calls · tag internal or external · then click Apply.</div>${blocks}
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);">
+      <span id="cal-summary"></span>
+      <button class="btn btn-primary btn-sm" onclick="applyCalCalls()">Apply to form</button>
+    </div>`;
+  updateCalSummary();
+}
+function tagEv(idx,tag) {
+  calWeekEvents[idx].tag=tag;
+  const bi=document.getElementById('ti-'+idx);
+  const be=document.getElementById('te-'+idx);
+  if(bi){bi.classList.toggle('active',tag==='internal');}
+  if(be){be.classList.toggle('active',tag==='external');}
+  updateCalSummary();
+}
+function toggleEv(idx,v){calWeekEvents[idx].included=v;updateCalSummary();}
+function updateCalSummary(){
+  const inc=calWeekEvents.filter(e=>e.included);
+  const el=document.getElementById('cal-summary');
+  if(el) el.innerHTML='<span class="tag tag-int">Internal: '+inc.filter(e=>e.tag==='internal').length+'</span> &nbsp; <span class="tag tag-ext">External: '+inc.filter(e=>e.tag==='external').length+'</span>';
+}
+function applyCalCalls(){
+  const inc=calWeekEvents.filter(e=>e.included);
+  const ints=inc.filter(e=>e.tag==='internal');
+  const exts=inc.filter(e=>e.tag==='external');
+  document.getElementById('c-int').value=ints.length;
+  document.getElementById('c-int-notes').value=ints.map(e=>e.title).slice(0,3).join(', ');
+  document.getElementById('c-ext').value=exts.length;
+  document.getElementById('c-ext-notes').value=exts.map(e=>e.title).slice(0,3).join(', ');
+}
+
+// ── INVOICE ────────────────────────────────────────────────────────────────
+function prefillInvoice(){
+  const today=new Date().toISOString().slice(0,10);
+  const due=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+  if(!document.getElementById('inv-date').value) document.getElementById('inv-date').value=today;
+  if(!document.getElementById('inv-due').value)  document.getElementById('inv-due').value=due;
+  if(!document.getElementById('inv-period').value) document.getElementById('inv-period').value=today.slice(0,7);
+}
+function generateInvoice(){
+  const rate=getRate();
+  const period=document.getElementById('inv-period').value;
+  const pe=period?entries.filter(e=>e.date.startsWith(period)):entries;
+  const totalH=pe.reduce((s,e)=>s+e.hours,0);
+  const totalAmt=totalH*rate;
+  const byDate={};
+  pe.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+  const rows=Object.keys(byDate).sort().map(date=>byDate[date].map((e,i)=>
+    `<tr><td>${i===0?date:''}</td><td style="text-align:center">${e.hours}h</td><td style="text-align:center">${e.units}</td><td style="color:var(--text2)">${e.notes||'—'}</td><td style="text-align:right">$${(e.hours*rate).toFixed(2)}</td></tr>`
+  ).join('')).join('');
+  const preview=document.getElementById('invoice-preview');
+  preview.style.display='block';
+  preview.innerHTML=`
+    <div class="invoice-header">
+      <div>
+        <div style="font-size:20px;font-weight:600;margin-bottom:4px;">${document.getElementById('inv-name').value}</div>
+        <div style="font-size:13px;color:var(--text2);">${document.getElementById('inv-addr').value}</div>
+        <div style="font-size:13px;color:var(--text2);">${document.getElementById('inv-email').value}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:16px;font-weight:600;margin-bottom:4px;">Invoice ${document.getElementById('inv-num').value}</div>
+        <div style="font-size:13px;color:var(--text2);">Issued: ${document.getElementById('inv-date').value}</div>
+        <div style="font-size:13px;color:var(--text2);">Due: ${document.getElementById('inv-due').value}</div>
+      </div>
+    </div>
+    ${document.getElementById('inv-summary').value?`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:12px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1rem;">${document.getElementById('inv-summary').value}</div>`:''}
+    <table class="invoice-table">
+      <thead><tr><th>Date</th><th style="text-align:center">Hours</th><th style="text-align:center">Units</th><th>Notes</th><th style="text-align:right">Amount</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="5" style="color:var(--text2);padding:1rem 8px;text-align:center;">No entries for this month.</td></tr>'}</tbody>
+      <tfoot><tr>
+        <td>Total</td><td style="text-align:center">${totalH.toFixed(1)}h</td><td style="text-align:center">${hoursToUnits(totalH)}</td>
+        <td style="color:var(--text2);font-size:12px;">$${rate}/hr</td>
+        <td style="text-align:right;font-size:16px;">$${totalAmt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      </tr></tfoot>
+    </table>
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--border);font-size:12px;color:var(--text2);">Please remit payment via ACH/Wire or crypto wallet per prior agreement.</div>`;
+}
+
+// ── SETUP ──────────────────────────────────────────────────────────────────
+function copyScript(btn){
+  navigator.clipboard.writeText(SCRIPT_CODE).then(()=>{
+    btn.innerHTML='<i class="ti ti-check"></i> Copied!';
+    setTimeout(()=>btn.innerHTML='<i class="ti ti-copy"></i> Copy',2000);
+  }).catch(()=>{
+    document.getElementById('apps-script-code').select();
+    document.execCommand('copy');
+    btn.innerHTML='<i class="ti ti-check"></i> Copied!';
+    setTimeout(()=>btn.innerHTML='<i class="ti ti-copy"></i> Copy',2000);
+  });
+}
+async function saveScriptUrl(){
+  const url=document.getElementById('script-url').value.trim(); if(!url) return;
+  scriptUrl=url; localStorage.setItem('ch_script_url',url);
+  const result=document.getElementById('connection-result');
+  result.style.color='var(--text2)'; result.textContent='Saving...';
+  try {
+    await fetch(url,{method:'POST',body:JSON.stringify({action:'test'}),mode:'no-cors'});
+    result.style.color='var(--green-text)';
+    result.textContent='✓ URL saved! Add a test entry and check your Google Sheet to confirm sync.';
+    setSyncBadge(true);
+  } catch(err) {
+    result.style.color='var(--red-text)';
+    result.textContent='Could not reach URL. Check deployment settings.';
+  }
+}
+async function syncAll(){
+  if(!scriptUrl){alert('Set up your script URL first.');return;}
+  for(const e of entries) await syncToSheets('addEntry',{date:e.date,hours:e.hours,notes:e.notes,rate:getRate()});
+  for(const e of msgEntries) await syncToSheets('addMsgEntry',e);
+  alert('All entries synced!');
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.getElementById('entry-date').value=new Date().toISOString().slice(0,10);
+document.getElementById('msg-week').value=new Date().toISOString().slice(0,10);
+updateMonthFilter(); renderEntries(); updateMetrics();
+renderMsgEntries(); updateMsgMetrics();
+</script>
+</body>
+</html>
