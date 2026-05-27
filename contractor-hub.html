@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Contractor Hub — Lucas Fada</title>
+<title>Contractor Hub v2 — Lucas Fada</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -91,6 +91,9 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
 .tag-btn-int.active { background:var(--purple-bg); font-weight:600; }
 .tag-btn-ext { border-color:var(--orange-text); color:var(--orange-text); }
 .tag-btn-ext.active { background:var(--orange-bg); font-weight:600; }
+.report-section { margin-bottom:1.5rem; }
+.report-section h3 { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:6px; padding-bottom:4px; border-bottom:0.5px solid var(--border); }
+.report-section p { font-size:13px; line-height:1.8; color:var(--text); }
 </style>
 </head>
 <body>
@@ -106,6 +109,7 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
       <label>Rate $/hr:</label>
       <input type="number" id="hourly-rate" value="100" style="width:72px;" onchange="renderEntries();updateMetrics();" />
     </div>
+    <div id="mtd-earned" style="font-size:13px;font-weight:600;color:var(--green-text);background:var(--green-bg);padding:4px 12px;border-radius:20px;">MTD: $0</div>
     <div id="sync-status" class="sync-badge sync-pending"><i class="ti ti-cloud"></i> Not connected</div>
   </div>
 </div>
@@ -114,6 +118,7 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
   <button class="tab active" onclick="showTab('log',this)"><i class="ti ti-clock"></i> Daily log</button>
   <button class="tab" onclick="showTab('messages',this)"><i class="ti ti-message"></i> Messages</button>
   <button class="tab" onclick="showTab('invoice',this)"><i class="ti ti-file-invoice"></i> Invoice</button>
+  <button class="tab" onclick="showTab('report',this)"><i class="ti ti-chart-bar"></i> Report</button>
   <button class="tab" onclick="showTab('setup',this)"><i class="ti ti-settings"></i> Setup</button>
 </div>
 
@@ -209,13 +214,13 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
 
   <div class="card">
     <div class="grid3">
-      <div><label>Week of</label><input type="date" id="msg-week" /></div>
+      <div><label>Date</label><input type="date" id="msg-week" /></div>
       <div><label>TG groups created</label><input type="number" id="msg-tg" placeholder="0" /></div>
       <div><label>Notes</label><input type="text" id="msg-notes" placeholder="Any context..." /></div>
     </div>
     <div class="flex">
-      <button class="btn btn-primary" onclick="addMsgEntry()"><i class="ti ti-plus"></i> Log week</button>
-      <button class="btn" id="cal-msg-btn" onclick="fetchCalendarCalls()"><i class="ti ti-calendar"></i> Pull calls from calendar</button>
+      <button class="btn btn-primary" onclick="addMsgEntry()"><i class="ti ti-plus"></i> Log day</button>
+      <button class="btn" id="cal-msg-btn" onclick="fetchCalendarCalls()"><i class="ti ti-calendar"></i> Pull calls from calendar today</button>
     </div>
     <div id="cal-calls-result" style="display:none;margin-top:12px;border-top:0.5px solid var(--border);padding-top:12px;"></div>
   </div>
@@ -235,7 +240,7 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
       <button class="btn btn-sm" onclick="clearMsgEntries()">Clear all</button>
     </div>
     <div style="display:grid;grid-template-columns:80px 50px 50px 50px 50px 44px 44px 44px 68px;gap:6px;padding:4px 0 8px;border-bottom:0.5px solid var(--border2);">
-      <span style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;">Week</span>
+      <span style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;">Date</span>
       <span style="font-size:10px;color:var(--blue-text);font-weight:600;text-transform:uppercase;">F.New</span>
       <span style="font-size:10px;color:var(--blue-text);font-weight:600;text-transform:uppercase;">F.FU</span>
       <span style="font-size:10px;color:var(--green-text);font-weight:600;text-transform:uppercase;">W.New</span>
@@ -281,6 +286,39 @@ textarea { resize:vertical; min-height:80px; line-height:1.5; }
     <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Print / save PDF</button>
   </div>
   <div id="invoice-preview" style="display:none;" class="card"></div>
+</div>
+
+
+<!-- REPORT -->
+<div id="panel-report" class="panel">
+  <div class="card">
+    <div class="flex-between" style="margin-bottom:1rem;">
+      <div class="section-title" style="margin:0;">Monthly report generator</div>
+      <div class="flex">
+        <select id="report-month" style="width:auto;font-size:13px;"></select>
+        <button class="btn btn-primary" onclick="generateReport()"><i class="ti ti-sparkles"></i> Generate report</button>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.6;">Pulls from your logged hours and message data for the selected month and drafts a report in your style — ready to send to Kat.</p>
+  </div>
+
+  <div id="report-output" style="display:none;">
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:1rem;">
+        <div class="section-title" style="margin:0;">Report preview</div>
+        <div class="flex">
+          <button class="btn btn-sm" onclick="copyReport()"><i class="ti ti-copy"></i> Copy</button>
+          <button class="btn btn-sm" onclick="window.print()"><i class="ti ti-printer"></i> Print</button>
+        </div>
+      </div>
+      <div id="report-content" style="font-size:13px;line-height:1.8;white-space:pre-wrap;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Key numbers</div>
+      <div class="grid4" id="report-metrics"></div>
+    </div>
+  </div>
 </div>
 
 <!-- SETUP -->
@@ -533,7 +571,7 @@ function addEntry() {
   document.getElementById('entry-notes').value='';
   document.getElementById('units-preview').textContent='— units';
   document.getElementById('cal-events').style.display='none';
-  updateMonthFilter(); renderEntries();
+  updateMonthFilter(); renderEntries(); updateMTD();
   syncToSheets('addEntry',{date:d,hours:h,notes:n,rate:getRate()});
 }
 function deleteEntry(id) { entries=entries.filter(e=>e.id!==id); save(); renderEntries(); updateMetrics(); }
@@ -669,6 +707,8 @@ function addMsgEntry() {
   msgEntries.push(e);
   msgEntries.sort((a,b)=>b.week.localeCompare(a.week));
   saveMsg(); renderMsgEntries(); updateMsgMetrics();
+populateReportMonths();
+updateMTD();
   syncToSheets('addMsgEntry',e);
   ['f-new','f-fu','f-resp','f-names','w-new','w-fu','w-resp','w-names','c-int','c-int-notes','c-ext','c-ext-notes','msg-tg','msg-notes'].forEach(id=>document.getElementById(id).value='');
 }
@@ -714,6 +754,8 @@ function saveMsgEdit() {
     notes:document.getElementById('em-notes').value
   }:e);
   saveMsg(); renderMsgEntries(); updateMsgMetrics();
+populateReportMonths();
+updateMTD();
   closeModal('edit-msg-overlay');
 }
 
@@ -721,7 +763,7 @@ function renderMsgEntries() {
   const list=document.getElementById('msg-list');
   if(!msgEntries.length){list.innerHTML='<div class="empty">No entries yet.</div>';return;}
   list.innerHTML=msgEntries.map(e=>`<div style="display:grid;grid-template-columns:80px 50px 50px 50px 50px 44px 44px 44px 68px;gap:6px;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px;">
-    <span>${e.week.slice(5)}</span>
+    <span>${e.week}</span>
     <span style="color:var(--blue-text);">${e.fNew||0}</span>
     <span style="color:var(--blue-text);">${e.fFu||0}</span>
     <span style="color:var(--green-text);">${e.wNew||0}</span>
@@ -752,30 +794,26 @@ function updateMsgMetrics() {
   document.getElementById('mm-cext').textContent=tCE;
 }
 
-// ── CALENDAR CALLS (weekly, with tagging UI) ───────────────────────────────
+// ── CALENDAR CALLS (daily, with tagging UI + duration → hours) ────────────
 async function fetchCalendarCalls() {
   if(!scriptUrl){alert('Connect Google Sheets first in the Setup tab.');return;}
   const date=document.getElementById('msg-week').value;
-  if(!date){alert('Pick a week date first.');return;}
+  if(!date){alert('Pick a date first.');return;}
   const btn=document.getElementById('cal-msg-btn');
   btn.innerHTML='<i class="ti ti-loader"></i> Loading...'; btn.disabled=true;
   calWeekEvents=[];
   try {
-    for(let i=0;i<7;i++){
-      const d=new Date(date); d.setDate(d.getDate()+i);
-      const ds=d.toISOString().slice(0,10);
-      const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'getCalendar',date:ds})});
-      const data=await r.json();
-      if(!data.ok||!data.events) continue;
-      data.events.forEach(ev=>calWeekEvents.push({...ev,date:ds,tag:ev.isInternal?'internal':'external',included:ev.looksLikeCall}));
-    }
+    const r=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'getCalendar',date})});
+    const data=await r.json();
+    if(!data.ok) throw new Error(data.error||'Unknown error');
+    if(data.events) data.events.forEach((ev,i)=>calWeekEvents.push({...ev,date,tag:ev.isInternal?'internal':'external',included:ev.looksLikeCall}));
     renderCalTagger();
   } catch(err) {
     const res=document.getElementById('cal-calls-result');
     res.style.display='block';
     res.innerHTML='<div style="color:var(--red-text);font-size:13px;">Could not fetch: '+err.message+'</div>';
   }
-  btn.innerHTML='<i class="ti ti-calendar"></i> Pull calls from calendar'; btn.disabled=false;
+  btn.innerHTML='<i class="ti ti-calendar"></i> Pull calls from calendar today'; btn.disabled=false;
 }
 
 function renderCalTagger() {
@@ -805,7 +843,8 @@ function renderCalTagger() {
   res.innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Check events to count as calls · tag internal or external · then click Apply.</div>${blocks}
     <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);">
       <span id="cal-summary"></span>
-      <button class="btn btn-primary btn-sm" onclick="applyCalCalls()">Apply to form</button>
+      <button class="btn btn-primary btn-sm" onclick="applyCalCalls()">Apply to call form</button>
+      <button class="btn btn-sm" onclick="applyCallsToHours()" style="border-color:var(--green-text);color:var(--green-text);"><i class="ti ti-clock"></i> Add hours to Daily Log</button>
     </div>`;
   updateCalSummary();
 }
@@ -820,8 +859,13 @@ function tagEv(idx,tag) {
 function toggleEv(idx,v){calWeekEvents[idx].included=v;updateCalSummary();}
 function updateCalSummary(){
   const inc=calWeekEvents.filter(e=>e.included);
+  const totalMins=inc.reduce((s,e)=>s+(e.durationMins||0),0);
+  const totalH=+(totalMins/60).toFixed(2);
   const el=document.getElementById('cal-summary');
-  if(el) el.innerHTML='<span class="tag tag-int">Internal: '+inc.filter(e=>e.tag==='internal').length+'</span> &nbsp; <span class="tag tag-ext">External: '+inc.filter(e=>e.tag==='external').length+'</span>';
+  if(el) el.innerHTML=
+    '<span class="tag tag-int">Internal: '+inc.filter(e=>e.tag==='internal').length+'</span> &nbsp; '+
+    '<span class="tag tag-ext">External: '+inc.filter(e=>e.tag==='external').length+'</span> &nbsp; '+
+    '<span class="tag" style="background:var(--bg2);color:var(--text2);">'+totalH+'h total</span>';
 }
 function applyCalCalls(){
   const inc=calWeekEvents.filter(e=>e.included);
@@ -831,6 +875,28 @@ function applyCalCalls(){
   document.getElementById('c-int-notes').value=ints.map(e=>e.title).slice(0,3).join(', ');
   document.getElementById('c-ext').value=exts.length;
   document.getElementById('c-ext-notes').value=exts.map(e=>e.title).slice(0,3).join(', ');
+}
+
+function applyCallsToHours(){
+  const inc=calWeekEvents.filter(e=>e.included);
+  const totalMins=inc.reduce((s,e)=>s+(e.durationMins||0),0);
+  const totalH=+(totalMins/60).toFixed(2);
+  if(!totalH){alert('No duration found on included events.');return;}
+  // Switch to daily log tab and pre-fill
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[onclick*="showTab('log'"]').classList.add('active');
+  document.getElementById('panel-log').classList.add('active');
+  document.getElementById('entry-date').value=calWeekEvents[0]?.date||new Date().toISOString().slice(0,10);
+  document.getElementById('entry-hours-raw').value=totalH;
+  updateUnitsPreview();
+  const summary=inc.map(e=>{
+    let s=e.title;
+    if(e.guests&&e.guests.length) s+=' (w/ '+e.guests.slice(0,2).join(', ')+(e.guests.length>2?'...':'')+')';
+    return s;
+  }).join(', ');
+  document.getElementById('entry-notes').value=summary;
+  document.getElementById('cal-events').style.display='none';
 }
 
 // ── INVOICE ────────────────────────────────────────────────────────────────
@@ -915,10 +981,137 @@ async function syncAll(){
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
+// ── REPORT ────────────────────────────────────────────────────────────────
+function populateReportMonths() {
+  const sel = document.getElementById('report-month');
+  if (!sel) return;
+  const months = [...new Set([
+    ...entries.map(e => e.date.slice(0,7)),
+    ...msgEntries.map(e => (e.week||'').slice(0,7))
+  ])].filter(Boolean).sort().reverse();
+  const cur = new Date().toISOString().slice(0,7);
+  sel.innerHTML = (months.includes(cur) ? months : [cur, ...months])
+    .map(m => `<option value="${m}">${new Date(m+'-15').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</option>`)
+    .join('');
+}
+
+function updateMTD() {
+  const cur = new Date().toISOString().slice(0,7);
+  const rate = getRate();
+  const total = entries.filter(e => e.date.startsWith(cur)).reduce((s,e) => s + e.hours, 0);
+  const earned = Math.round(total * rate);
+  const el = document.getElementById('mtd-earned');
+  if (el) el.textContent = 'MTD: $' + earned.toLocaleString();
+}
+
+function generateReport() {
+  const month = document.getElementById('report-month').value;
+  if (!month) return;
+  const rate = getRate();
+
+  // Hours data
+  const monthEntries = entries.filter(e => e.date.startsWith(month));
+  const totalHours = monthEntries.reduce((s,e) => s + e.hours, 0);
+  const totalUnits = hoursToUnits(totalHours);
+  const totalEarned = Math.round(totalHours * rate);
+  const workDays = monthEntries.filter(e => e.hours > 0).length;
+
+  // Messages data — match on month
+  const monthMsgs = msgEntries.filter(e => (e.week||'').startsWith(month));
+  const fNew = monthMsgs.reduce((s,e) => s + (e.fNew||0), 0);
+  const fFu = monthMsgs.reduce((s,e) => s + (e.fFu||0), 0);
+  const fResp = monthMsgs.reduce((s,e) => s + (e.fResp||0), 0);
+  const wNew = monthMsgs.reduce((s,e) => s + (e.wNew||0), 0);
+  const wFu = monthMsgs.reduce((s,e) => s + (e.wFu||0), 0);
+  const wResp = monthMsgs.reduce((s,e) => s + (e.wResp||0), 0);
+  const cInt = monthMsgs.reduce((s,e) => s + (e.cInt||0), 0);
+  const cExt = monthMsgs.reduce((s,e) => s + (e.cExt||0), 0);
+  const tg = monthMsgs.reduce((s,e) => s + (e.tg||0), 0);
+  const fRR = fNew ? Math.round(fResp/fNew*100) : 0;
+  const wRR = wNew ? Math.round(wResp/wNew*100) : 0;
+
+  // Unique communities / funders mentioned
+  const funders = [...new Set(monthMsgs.flatMap(e => (e.fNames||'').split(',').map(x=>x.trim()).filter(Boolean)))].slice(0,6);
+  const communities = [...new Set(monthMsgs.flatMap(e => (e.wNames||'').split(',').map(x=>x.trim()).filter(Boolean)))].slice(0,6);
+  const extNotes = [...new Set(monthMsgs.flatMap(e => (e.cExtNotes||'').split(',').map(x=>x.trim()).filter(Boolean)))].slice(0,4);
+
+  // Build notes timeline from daily log
+  const notesSample = monthEntries
+    .filter(e => e.notes && e.notes.trim())
+    .slice(0,8)
+    .map(e => `- ${e.date.slice(5)}: ${e.notes}`)
+    .join('
+');
+
+  const monthLabel = new Date(month+'-15').toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+  const report = `${monthLabel} — Monthly Report
+Lucas Fada · Partnerships & Ecosystem
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HOURS & BILLING
+${totalHours.toFixed(1)} hours worked across ${workDays} days (${totalUnits} units)
+Invoice amount: $${totalEarned.toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FUNDER PIPELINE
+${fNew + fFu} total messages sent — ${fNew} new leads, ${fFu} follow-ups
+${fResp} responses (${fRR}% response rate)${funders.length ? '
+Projects contacted: ' + funders.join(', ') : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WAVE / COMMUNITY OUTREACH
+${wNew + wFu} total messages — ${wNew} new, ${wFu} follow-ups
+${wResp} responses (${wRR}% response rate)${communities.length ? '
+Communities: ' + communities.join(', ') : ''}${tg ? '
+TG groups created: ' + tg : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CALLS
+${cInt} internal calls · ${cExt} external calls${extNotes.length ? '
+External: ' + extNotes.join(', ') : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACTIVITY LOG (sample)
+${notesSample || 'No daily notes logged this month.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  document.getElementById('report-output').style.display = 'block';
+  document.getElementById('report-content').textContent = report;
+
+  document.getElementById('report-metrics').innerHTML = [
+    {label:'Hours', value: totalHours.toFixed(1)+'h'},
+    {label:'Earned', value: '$'+totalEarned.toLocaleString()},
+    {label:'Funder msgs', value: fNew+fFu},
+    {label:'Funder resp%', value: fRR+'%'},
+    {label:'Wave msgs', value: wNew+wFu},
+    {label:'Wave resp%', value: wRR+'%'},
+    {label:'Int calls', value: cInt},
+    {label:'Ext calls', value: cExt},
+  ].map(m => `<div class="metric"><div class="metric-label">${m.label}</div><div class="metric-value" style="font-size:18px;">${m.value}</div></div>`).join('');
+}
+
+function copyReport() {
+  const text = document.getElementById('report-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
+    setTimeout(() => btn.innerHTML = '<i class="ti ti-copy"></i> Copy', 2000);
+  });
+}
+
 document.getElementById('entry-date').value=new Date().toISOString().slice(0,10);
 document.getElementById('msg-week').value=new Date().toISOString().slice(0,10);
 updateMonthFilter(); renderEntries(); updateMetrics();
 renderMsgEntries(); updateMsgMetrics();
+populateReportMonths();
+updateMTD();
 </script>
 </body>
 </html>
